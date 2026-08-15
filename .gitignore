@@ -1,0 +1,38 @@
+# エディタ / OS 生成ファイル
+.DS_Store
+.AppleDouble
+Thumbs.db
+Desktop.ini
+*~
+*.swp
+*.swo
+*.bak
+.idea/
+.vscode/
+
+# 秘密情報・資格情報・データベース
+.env
+.env.*
+.env.local
+*.env
+secrets/
+credentials*
+*.key
+*.pem
+*.pfx
+*.p12
+*.kdbx
+*.gpg
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.mdb
+*.accdb
+*.ldb
+*.mdf
+*.ldf
+*.sql
+
+# スクリプト実行時の生成物（USBドライブへ出力されるためリポジトリに含めない）
+/ventoy/
