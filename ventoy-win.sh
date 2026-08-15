@@ -4,6 +4,7 @@ set -euo pipefail
 ISO_FILE="Win11_25H2_Japanese_x64_v2.iso"
 VENTOY_PART=""
 VENTOY_MNT=""
+ISO_NAME=""
 
 # --- Ventoy USBドライブを自動検出 ---
 detect_ventoy_drive() {
@@ -54,17 +55,18 @@ mount_if_needed() {
     fi
 }
 
-# --- ventoy/ventoy.json を作成 ---
+# --- ventoy/ventoy.json を作成（ISOファイル名を埋め込む） ---
 write_json() {
     local mnt="$1"
-    cat > "$mnt/ventoy/ventoy.json" << 'EOF'
+    local iso="$2"
+    cat > "$mnt/ventoy/ventoy.json" << EOF
 {
     "control": [
         { "VTOY_WIN11_BYPASS_CHECK": "1" }
     ],
     "auto_install": [
         {
-            "image": "/Win11_25H2_Japanese_x64_v2.iso",
+            "image": "/$iso",
             "template": "/ventoy/autounattend.xml"
         }
     ]
@@ -153,14 +155,42 @@ write_xml() {
 EOF
 }
 
-# --- ISO がドライブのルートにあるか確認 ---
-check_iso() {
+# --- ドライブのルートにある ISO ファイルを検出して選択 ---
+select_iso() {
     local mnt="$1"
-    if [ -f "$mnt/$ISO_FILE" ]; then
-        echo "確認: $mnt/$ISO_FILE を検出しました。"
-    else
-        echo "警告: $mnt/$ISO_FILE が見つかりません。ドライブのルートに配置してください。"
-    fi
+    local -a isos=()
+    local f
+    while IFS= read -r f; do
+        [ -n "$f" ] || continue
+        isos+=("$f")
+    done < <(find "$mnt" -maxdepth 1 -type f -iname '*.iso' 2>/dev/null | sort)
+
+    case "${#isos[@]}" in
+        0)
+            ISO_NAME="$ISO_FILE"
+            echo "警告: $mnt のルートに ISO ファイルが見つかりません。"
+            echo "       既定のファイル名 ($ISO_NAME) を ventoy.json に設定します。"
+            ;;
+        1)
+            ISO_NAME="$(basename "${isos[0]}")"
+            echo "検出: ISO ファイル名 $ISO_NAME を使用します。"
+            ;;
+        *)
+            local i sel
+            echo "複数の ISO ファイルが見つかりました。使用するものを選択してください:"
+            for i in "${!isos[@]}"; do
+                printf '  [%d] %s\n' "$((i + 1))" "$(basename "${isos[$i]}")"
+            done
+            while :; do
+                read -r -p "番号を入力してください [1-${#isos[@]}]: " sel
+                if [[ "$sel" =~ ^[0-9]+$ ]] && (( sel >= 1 && sel <= ${#isos[@]} )); then
+                    ISO_NAME="$(basename "${isos[$((sel - 1))]}")"
+                    break
+                fi
+                echo "無効な入力です。"
+            done
+            ;;
+    esac
 }
 
 main() {
@@ -194,15 +224,15 @@ main() {
     esac
 
     mkdir -p "$VENTOY_MNT/ventoy"
-    write_json "$VENTOY_MNT"
+    select_iso "$VENTOY_MNT"
+    write_json "$VENTOY_MNT" "$ISO_NAME"
     write_xml "$VENTOY_MNT"
 
     echo ""
     echo "作成完了: $VENTOY_MNT/ventoy/ventoy.json"
     echo "作成完了: $VENTOY_MNT/ventoy/autounattend.xml"
     echo ""
-    check_iso "$VENTOY_MNT"
-    echo ""
+    echo "※ ventoy.json の image は「/$ISO_NAME」に設定しました。"
     echo "※ 起動時にこのドライブを選択すると Windows 11 が自動インストールされます。"
 }
 
