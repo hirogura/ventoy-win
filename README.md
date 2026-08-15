@@ -19,11 +19,28 @@ Windows 11 を Ventoy 経由で自動インストールするための設定フ�
 
 ## 使い方
 
-### 1. リポジトリをクローン
+### 1. リポジトリを取得
+
+#### git を使う場合
 
 ```bash
 git clone https://github.com/hirogura/ventoy-win.git
 cd ventoy-win
+```
+
+#### git を使わない場合（ZIP をダウンロード）
+
+```bash
+wget https://github.com/hirogura/ventoy-win/archive/refs/heads/main.zip
+unzip main.zip
+cd ventoy-win-main
+```
+
+スクリプト 1 個だけでよい場合は、`ventoy-win.sh` だけを直接ダウンロードしても構いません。
+
+```bash
+curl -LO https://raw.githubusercontent.com/hirogura/ventoy-win/main/ventoy-win.sh
+chmod +x ventoy-win.sh
 ```
 
 ### 2. Ventoy USB メモリを接続してスクリプトを実行
