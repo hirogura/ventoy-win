@@ -70,14 +70,14 @@ chmod +x ventoy-win.sh
 
 ```
 /run/media/<ユーザー名>/Ventoy/
-├── Win11_25H2_Japanese_x64_v2.iso
+├── Windows11_Client_x64_ja-jp_26300_9457.iso
 └── ventoy/
     ├── ventoy.json
     └── autounattend.xml
 ```
 
 ※ スクリプト実行時にドライブのルートにある `*.iso` を自動検出し、`ventoy.json` の `image` にそのファイル名を設定します。
-ISO が 1 つしかない場合は自動で使用し、複数ある場合はどれを使うか選択できます。ISO がない場合は既定のファイル名（`Win11_25H2_Japanese_x64_v2.iso`）を設定して警告を表示します。
+ISO が 1 つしかない場合は自動で使用し、複数ある場合はどれを使うか選択できます。ISO がない場合は既定のファイル名（`Windows11_Client_x64_ja-jp_26300_9457.iso`）を設定して警告を表示します。
 
 ### 5. USB メモリから起動
 

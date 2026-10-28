@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ISO_FILE="Win11_25H2_Japanese_x64_v2.iso"
+ISO_FILE="Windows11_Client_x64_ja-jp_26300_9457.iso"
 VENTOY_PART=""
 VENTOY_MNT=""
 ISO_NAME=""
@@ -147,6 +147,11 @@ write_xml() {
 <Order>1</Order>
 <CommandLine>reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v HiberbootEnabled /t REG_DWORD /d 0 /f</CommandLine>
 <Description>Disable Fast Startup</Description>
+</SynchronousCommand>
+<SynchronousCommand wcm:action="add">
+<Order>2</Order>
+<CommandLine>powershell -Command "Get-LocalUser | ForEach-Object { Set-LocalUser -Name $_.Name -PasswordNeverExpires $true }"</CommandLine>
+<Description>すべてのローカルユーザーをパスワード無期限にする</Description>
 </SynchronousCommand>
 </FirstLogonCommands>
 </component>
